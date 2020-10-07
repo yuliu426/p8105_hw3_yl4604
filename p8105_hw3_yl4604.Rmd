@@ -134,9 +134,9 @@ act_amt_df =
     summarise(total_act_amt = sum(amt_act, na.rm = TRUE)) 
 knitr::kable(act_amt_df)
 
-ggplot(act_amt_df, aes(x = week, y = total_act_amt, fill = day)) +
+ggplot(act_amt_df, aes(x = week, y = total_act_amt, color = day)) +
 geom_point() +
-geom_violin()
+geom_line()
 
 ```
 
@@ -146,11 +146,65 @@ Make a plot
 ```{r}
 accel_df %>%
   ggplot(aes(x = min_of_day, y = amt_act, color = day)) +
-  geom_point() +
-  geom_line(alpha = .5)
+  geom_point(alpha = .5) +
+  geom_smooth()
+  #geom_line(alpha = .5)
   
 ```
 
 ???
 
+
+##Problem 3 
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+This dataset contains variables for all NEW YORK weather station from January 1, 1981 through December 31, 2010. variables in this datasets are `r names(ny_noaa)`. The dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns.
+
+Clean and wrangling the data. Find the most commonly obvserved value for snow fall.
+
+```{r}
+ny_noaa_df =
+  ny_noaa %>% 
+  separate(date, into = c('year', 'month', 'day'), sep = '-') %>% 
+#? can not use unique(ny_noaa_df, snow)?....object 'snow' not found
+  mutate(
+    tmin = as.numeric(tmin),
+    tmin = tmin / 10,
+    tmax = as.numeric(tmax),
+    tmax = tmax / 10,
+    snow = snow / 10
+  )
+ny_noaa_df %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
+
+The most commonly observed values for snowfall are o and NA. It is because except for some coldest days in winter, normally New York would not snow.
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. 
+
+```{r}
+ny_noaa_df %>% 
+  filter(month %in% c('01','07')) %>% 
+  group_by(month, year, id) %>% 
+  summarize(avg_tmax = mean(tmax)) %>% 
+  ggplot(aes(x = id, y = avg_tmax, color = year)) +
+  geom_point()
+  geom_line() +
+  facet_grid(. ~ month) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+According to the boxplot, average max temperatures in July are significantly higher than  January in each station across years, which is faily reasonalble. There are some outliers.  
+
+tmax vs tmin
+
+```{r}
+ny_noaa_df %>% 
+  
+```
 
