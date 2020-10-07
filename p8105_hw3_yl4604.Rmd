@@ -192,9 +192,8 @@ ny_noaa_df %>%
   filter(month %in% c('01','07')) %>% 
   group_by(month, year, id) %>% 
   summarize(avg_tmax = mean(tmax)) %>% 
-  ggplot(aes(x = id, y = avg_tmax, color = year)) +
-  geom_point()
-  geom_line() +
+  ggplot(aes(x = year, y = avg_tmax )) +
+  geom_boxplot() +
   facet_grid(. ~ month) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
@@ -202,9 +201,20 @@ ny_noaa_df %>%
 According to the boxplot, average max temperatures in July are significantly higher than  January in each station across years, which is faily reasonalble. There are some outliers.  
 
 tmax vs tmin
-
+???
 ```{r}
-ny_noaa_df %>% 
+tmax_vx_tmin = 
+  ny_noaa_df %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex()
+
+snow_fall_df = 
+  ny_noaa_df %>% 
+  filter(snow > 0) %>% 
+  filter(snow < 100) %>% 
+  ggplot(aes(x = year, y = snow)) +
+  geom_boxplot()
+  
   
 ```
 
