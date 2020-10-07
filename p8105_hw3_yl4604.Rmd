@@ -97,3 +97,60 @@ instacart %>%
   knitr::kable()
 ```
 
+
+
+## Problem 2
+
+import and tidy the data
+
+```{r}
+accel_df = 
+  read_csv('./data/accel_data.csv') %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = 'min_of_day',
+    values_to = 'amt_act',
+    names_prefix = 'activity_'
+  ) %>% 
+  mutate(min_of_day = as.numeric(min_of_day)) %>% 
+  mutate(weekday_weekend = case_when(
+    day == 'Saturday' ~ 'weekend',
+    day == 'Sunday' ~ 'weekend',
+    TRUE ~ 'weekday'
+  ) ) %>% 
+  mutate(day = forcats::fct_relevel(day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'))
+  
+```
+
+The dataset has variables: `r names(accel_df)`, containing five weeks of the activity counts for each minutes of a 24-hours day of a a 63 year-old male with BMI 25.
+
+Aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals.
+
+```{r}
+act_amt_df =
+  accel_df %>% 
+    group_by(week, day) %>% 
+    summarise(total_act_amt = sum(amt_act, na.rm = TRUE)) 
+knitr::kable(act_amt_df)
+
+ggplot(act_amt_df, aes(x = week, y = total_act_amt, fill = day)) +
+geom_point() +
+geom_violin()
+
+```
+
+???trends?
+
+Make a plot
+```{r}
+accel_df %>%
+  ggplot(aes(x = min_of_day, y = amt_act, color = day)) +
+  geom_point() +
+  geom_line(alpha = .5)
+  
+```
+
+???
+
+
